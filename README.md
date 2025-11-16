@@ -98,7 +98,7 @@ BudApp to zaawansowana aplikacja Flutter zaprojektowana dla profesjonalistów i 
 
 ---
 
-## 🏗️ Architektura Techniczna
+## Architektura Techniczna
 
 ### Stack Technologiczny
 
