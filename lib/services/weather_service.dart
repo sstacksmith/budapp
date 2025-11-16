@@ -56,7 +56,6 @@ class WeatherService {
     http.Response forecastResponse;
     
     try {
-      // Dodaj timeout do requestów (30 sekund)
       currentResponse = await http.get(currentUri).timeout(
         const Duration(seconds: 30),
         onTimeout: () {

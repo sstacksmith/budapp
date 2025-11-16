@@ -10,7 +10,6 @@ class PdfService {
   Future<File> generateRenovationPdf(RenovationPlan plan) async {
     final pdf = pw.Document();
 
-    // Add pages
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -31,7 +30,6 @@ class PdfService {
       ),
     );
 
-    // Save PDF
     final output = await getTemporaryDirectory();
     final file = File('${output.path}/remont_${plan.id}.pdf');
     await file.writeAsBytes(await pdf.save());
@@ -145,7 +143,6 @@ class PdfService {
               ),
               pw.SizedBox(height: 30),
 
-              // Seller and Buyer info
               pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
@@ -160,11 +157,9 @@ class PdfService {
               ),
               pw.SizedBox(height: 30),
 
-              // Items table
               _buildInvoiceTable(items),
               pw.SizedBox(height: 20),
 
-              // Summary
               pw.Container(
                 alignment: pw.Alignment.centerRight,
                 child: pw.Container(
@@ -211,7 +206,6 @@ class PdfService {
               ),
               pw.SizedBox(height: 30),
 
-              // Payment method
               pw.Text(
                 'Sposób płatności: Przelew bankowy',
                 style: const pw.TextStyle(fontSize: 12),
@@ -222,7 +216,6 @@ class PdfService {
               ),
               pw.Spacer(),
 
-              // Signatures
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
@@ -278,8 +271,6 @@ class PdfService {
       subject: title,
     );
   }
-
-  // Private helper methods
 
   pw.Widget _buildHeader(RenovationPlan plan) {
     return pw.Column(

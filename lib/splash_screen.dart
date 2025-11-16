@@ -26,7 +26,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     
-    // Animacja fade in/out
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -38,22 +37,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     
     _controller.forward();
     
-    // Background loading
     _initializeApp();
   }
 
   Future<void> _initializeApp() async {
     try {
-      // Minimum splash time (żeby użytkownik zobaczył logo)
       final minimumSplashTime = Future.delayed(const Duration(seconds: 2));
       
-      // Initialize app resources
       final initFuture = widget.onInit?.call() ?? Future.value();
       
-      // Czekaj na oba (minimum 2s + init)
       await Future.wait([minimumSplashTime, initFuture]);
       
-      // Fade out animation
       await _controller.reverse();
       
       if (mounted) {
@@ -82,7 +76,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       return widget.child;
     }
 
-    // Wrap Scaffold with Directionality to fix the error
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Scaffold(
@@ -93,7 +86,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo aplikacji
               Container(
                 width: 120,
                 height: 120,
@@ -116,7 +108,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
               const SizedBox(height: 24),
               
-              // Nazwa aplikacji
               const Text(
                 'BudApp',
                 style: TextStyle(
@@ -127,7 +118,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
               const SizedBox(height: 8),
               
-              // Tagline
               Text(
                 'Twój Asystent Budowlany',
                 style: TextStyle(
@@ -137,7 +127,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
               const SizedBox(height: 48),
               
-              // Loading indicator
               const SizedBox(
                 width: 40,
                 height: 40,

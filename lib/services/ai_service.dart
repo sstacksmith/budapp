@@ -9,12 +9,10 @@ import '../models/renovation_plan.dart';
 class AIService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
-  // Get API key from environment variables
   String get _apiKey => dotenv.env['GEMINI_API_KEY'] ?? '';
   
   final String aiMode = 'gemini';
   
-  // Gemini Model
   late final GenerativeModel? _geminiModel;
   
   AIService() {
@@ -32,7 +30,6 @@ class AIService {
     }
   }
 
-  // Generate renovation plan using AI
   Future<RenovationPlan> generateRenovationPlan({
     required String userId,
     required String name,
@@ -41,7 +38,6 @@ class AIService {
     required double budget,
   }) async {
     try {
-      // Validate input
       if (rooms.isEmpty) {
         throw Exception('Lista pokoi nie może być pusta');
       }
@@ -50,7 +46,6 @@ class AIService {
         throw Exception('Budżet musi być większy od zera');
       }
       
-      // Generate materials for each room based on work description
       List<Room> enhancedRooms = [];
       for (Room room in rooms) {
         List<Material> materials;
@@ -80,13 +75,10 @@ class AIService {
         ));
       }
 
-      // Generate recommendations
       List<Recommendation> recommendations = await _generateRecommendations(enhancedRooms, budget);
 
-      // Calculate total cost
       double totalCost = enhancedRooms.fold(0.0, (sum, room) => sum + room.estimatedCost);
 
-      // Create renovation plan
       RenovationPlan plan = RenovationPlan(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         userId: userId,
@@ -102,7 +94,6 @@ class AIService {
         recommendations: recommendations,
       );
 
-      // Save to Firestore
       try {
         Map<String, dynamic> firestoreData = plan.toFirestore();
         await _firestore.collection('renovation_plans').doc(plan.id).set(firestoreData);
@@ -116,14 +107,11 @@ class AIService {
     }
   }
 
-  // Generate materials for a specific room based on work description
   Future<List<Material>> _generateMaterialsForRoom(Room room) async {
     List<Material> materials = [];
     
-    // Calculate wall area (assuming 2.7m height)
-    double wallArea = room.area * 2.5; // Obwód * wysokość (uproszczone)
+    double wallArea = room.area * 2.5;
     
-    // Analyze work description for keywords
     String workDesc = room.workDescription.toLowerCase();
     bool needsPainting = workDesc.contains('malowanie') || workDesc.contains('farba') || workDesc.contains('ścian');
     bool needsTiling = workDesc.contains('płytki') || workDesc.contains('kafelki') || workDesc.contains('glazura');
@@ -132,9 +120,7 @@ class AIService {
     bool needsPlumbing = workDesc.contains('hydraulika') || workDesc.contains('rury') || workDesc.contains('woda');
     bool needsDemolition = workDesc.contains('wyburzenie') || workDesc.contains('rozbiórka') || workDesc.contains('demontaż');
     
-    // Generate materials based on work description AND room type
     if (needsPainting) {
-      // Grunt pod farbę
       materials.add(Material(
         id: '${room.id}_primer',
         name: 'Grunt głęboko penetrujący',
@@ -149,7 +135,6 @@ class AIService {
         description: 'Grunt głęboko penetrujący pod farbę',
       ));
       
-      // Gładź gipsowa
       materials.add(Material(
         id: '${room.id}_plaster',
         name: 'Gładź gipsowa',
@@ -164,7 +149,6 @@ class AIService {
         description: 'Gładź gipsowa do wyrównania ścian',
       ));
       
-      // Farba emulsyjna
       materials.add(Material(
         id: '${room.id}_paint',
         name: 'Farba emulsyjna premium',
@@ -181,7 +165,6 @@ class AIService {
     }
     
     if (needsTiling) {
-      // Płytki ceramiczne
       materials.add(Material(
         id: '${room.id}_tiles',
         name: 'Płytki ceramiczne premium',
@@ -196,7 +179,6 @@ class AIService {
         description: 'Płytki ceramiczne premium 60x60cm',
       ));
       
-      // Klej do płytek
       materials.add(Material(
         id: '${room.id}_tile_adhesive',
         name: 'Klej do płytek',
@@ -211,7 +193,6 @@ class AIService {
         description: 'Klej do płytek ceramicznych C2TE',
       ));
       
-      // Fuga
       materials.add(Material(
         id: '${room.id}_grout',
         name: 'Fuga epoksydowa',
@@ -226,7 +207,6 @@ class AIService {
         description: 'Fuga epoksydowa wodoodporna',
       ));
       
-      // Podkład pod płytki
       materials.add(Material(
         id: '${room.id}_tile_primer',
         name: 'Preparat gruntujący',
@@ -243,7 +223,6 @@ class AIService {
     }
     
     if (needsFlooring) {
-      // Panele podłogowe
       materials.add(Material(
         id: '${room.id}_flooring',
         name: 'Panele laminowane AC5',
@@ -258,7 +237,6 @@ class AIService {
         description: 'Panele laminowane AC5, klasa ścieralności 32',
       ));
       
-      // Podkład pod panele
       materials.add(Material(
         id: '${room.id}_underlay',
         name: 'Podkład pod panele',
@@ -273,8 +251,7 @@ class AIService {
         description: 'Podkład piankowy 3mm',
       ));
       
-      // Listwy przypodłogowe
-      double perimeterEstimate = math.sqrt(room.area) * 4; // Przybliżony obwód
+      double perimeterEstimate = math.sqrt(room.area) * 4;
       materials.add(Material(
         id: '${room.id}_skirting',
         name: 'Listwy przypodłogowe',
@@ -290,7 +267,6 @@ class AIService {
       ));
     }
     
-    // Base materials based on room type (fallback)
     if (materials.isEmpty) {
       switch (room.type) {
       case 'kitchen':
@@ -388,10 +364,6 @@ class AIService {
     return materials;
   }
 
-  // ========================================
-  // GEMINI AI METHODS
-  // ========================================
-  
   /// Generate materials using Google Gemini AI
   Future<List<Material>> _generateMaterialsWithGemini(Room room) async {
     try {
@@ -445,7 +417,6 @@ Format odpowiedzi (przykład):
       final response = await _geminiModel!.generateContent([Content.text(prompt)]);
       final text = response.text ?? '';
       
-      // Parse JSON response
       final jsonStart = text.indexOf('[');
       final jsonEnd = text.lastIndexOf(']') + 1;
       
@@ -474,7 +445,6 @@ Format odpowiedzi (przykład):
         }).toList();
       }
       
-      // Fallback to keyword matching if parsing fails
       return _generateMaterialsForRoom(room);
     } catch (e) {
       return _generateMaterialsForRoom(room);
@@ -536,8 +506,6 @@ Format odpowiedzi:
         final jsonStr = text.substring(jsonStart, jsonEnd);
         final List<dynamic> tasksData = jsonDecode(jsonStr);
         
-        
-        // Sort by order if provided
         tasksData.sort((a, b) {
           final orderA = a['order'] ?? 999;
           final orderB = b['order'] ?? 999;
@@ -565,14 +533,11 @@ Format odpowiedzi:
     }
   }
 
-  // Generate tasks for a specific room based on work description
   Future<List<Task>> _generateTasksForRoom(Room room) async {
     List<Task> tasks = [];
     
-    // Calculate wall area (assuming 2.7m height)
-    double wallArea = room.area * 2.5; // Obwód * wysokość (uproszczone)
+    double wallArea = room.area * 2.5;
     
-    // Analyze work description for tasks
     String workDesc = room.workDescription.toLowerCase();
     bool needsPainting = workDesc.contains('malowanie') || workDesc.contains('farba');
     bool needsTiling = workDesc.contains('płytki') || workDesc.contains('kafelki');
@@ -581,7 +546,6 @@ Format odpowiedzi:
     bool needsPlumbing = workDesc.contains('hydraulika') || workDesc.contains('rury');
     bool needsDemolition = workDesc.contains('wyburzenie') || workDesc.contains('rozbiórka');
     
-    // Przygotowanie powierzchni (zawsze potrzebne)
     tasks.add(Task(
       id: '${room.id}_preparation',
       name: 'Przygotowanie powierzchni',
@@ -594,7 +558,6 @@ Format odpowiedzi:
       dependencies: [],
     ));
     
-    // Generate tasks based on work description
     if (needsTiling) {
       tasks.add(Task(
         id: '${room.id}_tiling',
@@ -610,7 +573,6 @@ Format odpowiedzi:
     }
     
     if (needsPainting) {
-      // Szpachlowanie
       tasks.add(Task(
         id: '${room.id}_plastering',
         name: 'Szpachlowanie ścian',
@@ -623,7 +585,6 @@ Format odpowiedzi:
         dependencies: ['${room.id}_preparation'],
       ));
       
-      // Malowanie
       tasks.add(Task(
         id: '${room.id}_painting',
         name: 'Malowanie ścian i sufitów',
@@ -652,8 +613,7 @@ Format odpowiedzi:
     }
     
     if (needsElectrical) {
-      // Koszt zależy od wielkości pomieszczenia
-      int outletsEstimate = (room.area / 10).ceil() + 2; // ~1 gniazdko na 10m²
+      int outletsEstimate = (room.area / 10).ceil() + 2;
       tasks.add(Task(
         id: '${room.id}_electrical',
         name: 'Prace elektryczne',
@@ -695,7 +655,6 @@ Format odpowiedzi:
       ));
     }
     
-    // Fallback: generate tasks based on room type if no specific tasks
     if (tasks.isEmpty) {
       switch (room.type) {
       case 'kitchen':
@@ -792,14 +751,11 @@ Format odpowiedzi:
     return tasks;
   }
 
-  // Generate AI recommendations
   Future<List<Recommendation>> _generateRecommendations(List<Room> rooms, double budget) async {
     List<Recommendation> recommendations = [];
     
     double totalCost = rooms.fold(0.0, (sum, room) => sum + room.estimatedCost);
     
-    
-    // 1. Budget recommendations
     if (totalCost > budget) {
       double difference = totalCost - budget;
       recommendations.add(Recommendation(
@@ -826,7 +782,6 @@ Format odpowiedzi:
       }
     }
 
-    // 2. Material-based recommendations
     Map<String, List<Material>> materialsByCategory = {};
     for (Room room in rooms) {
       for (Material material in room.materials) {
@@ -838,7 +793,6 @@ Format odpowiedzi:
       }
     }
 
-    // Recommendations for expensive materials
     int materialRecommendationsCount = 0;
     for (Room room in rooms) {
       for (Material material in room.materials) {
@@ -858,7 +812,6 @@ Format odpowiedzi:
       }
     }
 
-    // 3. Task optimization recommendations
     Map<String, List<Room>> roomsByTask = {};
     for (Room room in rooms) {
       for (Task task in room.tasks) {
@@ -887,7 +840,6 @@ Format odpowiedzi:
       }
     }
 
-    // 4. Season-based recommendations
     DateTime now = DateTime.now();
     if (now.month >= 11 || now.month <= 2) {
       recommendations.add(Recommendation(
@@ -911,7 +863,6 @@ Format odpowiedzi:
       ));
     }
 
-    // 5. Quality recommendations
     bool hasWaterProofing = rooms.any((r) => 
       r.materials.any((m) => m.category == 'waterproofing') || 
       r.type == 'bathroom'
@@ -929,7 +880,6 @@ Format odpowiedzi:
       ));
     }
 
-    // 6. Always add at least one general tip
     if (recommendations.isEmpty || recommendations.length < 2) {
       recommendations.add(Recommendation(
         id: 'general_tip_1',
@@ -980,13 +930,9 @@ Format odpowiedzi:
     return names[category] ?? category;
   }
 
-  // Get material prices from various suppliers
   Future<List<MaterialPrice>> _getMaterialPrices() async {
-    // Simulate fetching prices from multiple suppliers
-    // W rzeczywistej aplikacji użyj web scraping lub API
     List<MaterialPrice> prices = [];
     
-    // Płytki ceramiczne premium
     prices.addAll([
       MaterialPrice(
         id: 'tiles_leroy',
@@ -1026,7 +972,6 @@ Format odpowiedzi:
       ),
     ]);
     
-    // Farba emulsyjna premium
     prices.addAll([
       MaterialPrice(
         id: 'paint_leroy',
@@ -1057,7 +1002,6 @@ Format odpowiedzi:
       ),
     ]);
     
-    // Panele laminowane AC5
     prices.addAll([
       MaterialPrice(
         id: 'flooring_leroy',
@@ -1088,7 +1032,6 @@ Format odpowiedzi:
       ),
     ]);
     
-    // Klej do płytek
     prices.addAll([
       MaterialPrice(
         id: 'adhesive_leroy',
@@ -1119,13 +1062,11 @@ Format odpowiedzi:
       ),
     ]);
     
-    // Sort by price (lowest first)
     prices.sort((a, b) => a.price.compareTo(b.price));
     
     return prices;
   }
 
-  // Update material prices
   Future<void> updateMaterialPrices() async {
     try {
       List<MaterialPrice> prices = await _getMaterialPrices();
@@ -1138,17 +1079,14 @@ Format odpowiedzi:
     }
   }
 
-  // Get renovation plans for user
   Future<List<RenovationPlan>> getUserRenovationPlans(String userId) async {
     try {
-      
       QuerySnapshot snapshot = await _firestore
           .collection('renovation_plans')
           .where('userId', isEqualTo: userId)
           .orderBy('createdAt', descending: true)
           .get();
 
-      
       List<RenovationPlan> plans = snapshot.docs
           .map((doc) {
             try {
@@ -1163,8 +1101,6 @@ Format odpowiedzi:
       
       return plans;
     } catch (e) {
-      
-      // Jeśli błąd to brak indeksu, zwróć pustą listę zamiast rzucać wyjątek
       if (e.toString().contains('FAILED_PRECONDITION') || 
           e.toString().contains('requires an index')) {
         return [];
@@ -1174,7 +1110,6 @@ Format odpowiedzi:
     }
   }
 
-  // Delete renovation plan
   Future<void> deleteRenovationPlan(String planId) async {
     try {
       await _firestore.collection('renovation_plans').doc(planId).delete();
@@ -1183,15 +1118,10 @@ Format odpowiedzi:
     }
   }
 
-  // Regenerate AI recommendations for an existing plan
   Future<RenovationPlan> regenerateRecommendations(RenovationPlan plan) async {
     try {
-      
-      // Generate new recommendations
       List<Recommendation> newRecommendations = await _generateRecommendations(plan.rooms, plan.totalBudget);
       
-      
-      // Create updated plan
       RenovationPlan updatedPlan = RenovationPlan(
         id: plan.id,
         userId: plan.userId,
@@ -1207,12 +1137,10 @@ Format odpowiedzi:
         recommendations: newRecommendations,
       );
       
-      // Update in Firestore
       await _firestore.collection('renovation_plans').doc(plan.id).update({
         'recommendations': newRecommendations.map((rec) => rec.toMap()).toList(),
         'updatedAt': Timestamp.fromDate(DateTime.now()),
       });
-      
       
       return updatedPlan;
     } catch (e) {

@@ -28,7 +28,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    // Sprawdź uprawnienia
     final status = await Permission.camera.request();
     if (status != PermissionStatus.granted) {
       _showPermissionDialog();
@@ -153,7 +152,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
               ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
-                // Tutaj można dodać logikę kalibracji
               },
             ),
           ],
@@ -166,7 +164,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Logika kalibracji
             },
             child: Text(loc.measure),
           ),
@@ -208,12 +205,10 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
               behavior: HitTestBehavior.translucent,
               child: Stack(
                 children: [
-                  // Podgląd aparatu
                   Positioned.fill(
                     child: CameraPreview(_cameraController!),
                   ),
                   
-                  // Overlay z liniami pomiarowymi
                   Positioned.fill(
                     child: IgnorePointer(
                       child: CustomPaint(
@@ -226,7 +221,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
                     ),
                   ),
                   
-                  // Wskazówka dla użytkownika
                   if (_isMeasuring && _measurementPoints.isEmpty)
                     Positioned(
                       top: 100,
@@ -279,7 +273,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
                       ),
                     ),
                 
-                // Panel kontrolny
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -293,7 +286,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Status pomiaru
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
@@ -308,7 +300,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
                         
                         const SizedBox(height: 16),
                         
-                        // Aktualny pomiar
                         if (_currentMeasurement.isNotEmpty)
                           Container(
                             padding: const EdgeInsets.all(12),
@@ -328,7 +319,6 @@ class _RoomMeasurementScreenState extends State<RoomMeasurementScreen> {
                         
                         const SizedBox(height: 16),
                         
-                        // Przyciski kontrolne
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -409,15 +399,12 @@ class MeasurementPainter extends CustomPainter {
       ..color = Colors.yellow
       ..style = PaintingStyle.fill;
 
-    // Rysuj linie pomiarowe
     for (final line in lines) {
       canvas.drawLine(line.start, line.end, paint);
       
-      // Rysuj punkty końcowe
       canvas.drawCircle(line.start, 8, pointPaint);
       canvas.drawCircle(line.end, 8, pointPaint);
       
-      // Rysuj etykietę z długością
       final center = Offset(
         (line.start.dx + line.end.dx) / 2,
         (line.start.dy + line.end.dy) / 2,
@@ -448,7 +435,6 @@ class MeasurementPainter extends CustomPainter {
       );
     }
 
-    // Rysuj aktualne punkty podczas pomiaru
     if (isMeasuring) {
       for (final point in points) {
         canvas.drawCircle(point, 10, pointPaint);

@@ -5,7 +5,6 @@ class PreferencesService {
   static const String _themeModeKey = 'theme_mode';
   static const String _localeKey = 'locale';
 
-  // Singleton pattern
   static final PreferencesService _instance = PreferencesService._internal();
   factory PreferencesService() => _instance;
   PreferencesService._internal();
@@ -16,7 +15,6 @@ class PreferencesService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  // Theme Mode
   Future<void> saveThemeMode(ThemeMode mode) async {
     await _prefs?.setString(_themeModeKey, mode.toString());
   }
@@ -38,7 +36,6 @@ class PreferencesService {
     }
   }
 
-  // Locale
   Future<void> saveLocale(Locale? locale) async {
     if (locale == null) {
       await _prefs?.remove(_localeKey);

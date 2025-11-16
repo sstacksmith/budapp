@@ -35,7 +35,6 @@ void main() async {
     debugPrint('Failed to load .env: $e');
   }
   
-  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -192,7 +191,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
               );
             }
             
-            // Jeśli użytkownik jest zalogowany
             if (snapshot.hasData) {
               final user = snapshot.data;
               
@@ -420,11 +418,9 @@ class DashboardPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Powitanie
           _buildWelcomeCard(context, loc),
           const SizedBox(height: 20),
           
-          // Szybkie akcje
           Text(
             'Szybkie akcje',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -474,7 +470,6 @@ class DashboardPage extends StatelessWidget {
           
           const SizedBox(height: 24),
           
-          // Ostatnie obliczenia
           Text(
             'Ostatnie obliczenia',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(

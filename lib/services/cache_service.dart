@@ -5,7 +5,6 @@ class CacheService {
   static const String _cachePrefix = 'cache_';
   static const Duration _defaultCacheDuration = Duration(hours: 24);
 
-  // Singleton pattern
   static final CacheService _instance = CacheService._internal();
   factory CacheService() => _instance;
   CacheService._internal();
@@ -16,7 +15,6 @@ class CacheService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  // Save data to cache
   Future<void> saveToCache(String key, Map<String, dynamic> data, {Duration? duration}) async {
     final cacheKey = '$_cachePrefix$key';
     final expiryTime = DateTime.now().add(duration ?? _defaultCacheDuration).millisecondsSinceEpoch;
@@ -29,7 +27,6 @@ class CacheService {
     await _prefs?.setString(cacheKey, jsonEncode(cacheData));
   }
 
-  // Get data from cache
   Map<String, dynamic>? getFromCache(String key) {
     final cacheKey = '$_cachePrefix$key';
     final String? cacheString = _prefs?.getString(cacheKey);
@@ -54,7 +51,6 @@ class CacheService {
     }
   }
 
-  // Clear specific cache
   Future<void> clearCache(String key) async {
     final cacheKey = '$_cachePrefix$key';
     await _prefs?.remove(cacheKey);
@@ -70,7 +66,6 @@ class CacheService {
     }
   }
 
-  // Check if cache exists and is valid
   bool isCacheValid(String key) {
     final cacheKey = '$_cachePrefix$key';
     final String? cacheString = _prefs?.getString(cacheKey);

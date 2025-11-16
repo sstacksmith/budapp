@@ -680,9 +680,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> with SingleTicker
       
       if (!mounted) return;
       
-      // Update the widget's plan
       setState(() {
-        // Replace the plan's recommendations
         widget.plan.recommendations.clear();
         widget.plan.recommendations.addAll(updatedPlan.recommendations);
       });
@@ -973,14 +971,12 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> with SingleTicker
       );
     }
 
-    // Get unique material names
     Set<String> materialNames = widget.plan.materialPrices
         .map((p) => p.materialName)
         .toSet();
     
     return Column(
       children: [
-        // Filter chips
         Container(
           padding: const EdgeInsets.all(16),
           child: Wrap(
@@ -1009,7 +1005,6 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> with SingleTicker
           ),
         ),
         
-        // Filtered price list
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),

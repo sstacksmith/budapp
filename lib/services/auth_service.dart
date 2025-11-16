@@ -7,13 +7,10 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CacheService _cacheService = CacheService();
 
-  // Get current user
   User? get currentUser => _auth.currentUser;
 
-  // Auth state changes stream
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Sign in with email and password
   Future<UserCredential?> signInWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
@@ -21,7 +18,6 @@ class AuthService {
         password: password,
       );
       
-      // Check if email is verified
       if (!result.user!.emailVerified) {
         await _auth.signOut(); // Wyloguj jeśli email nie zweryfikowany
         throw Exception('EMAIL_NOT_VERIFIED');
@@ -33,7 +29,6 @@ class AuthService {
     }
   }
 
-  // Register with email and password
   Future<UserCredential?> registerWithEmailAndPassword(String email, String password, String name) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
@@ -44,8 +39,7 @@ class AuthService {
       await result.user?.updateDisplayName(name);
       await result.user?.sendEmailVerification();
       
-      // Create user document in Firestore
-          await _firestore.collection('users').doc(result.user!.uid).set({
+      await _firestore.collection('users').doc(result.user!.uid).set({
             'name': name,
             'email': email,
             'emailVerified': false,
@@ -64,9 +58,7 @@ class AuthService {
     }
   }
 
-  // Sign out
   Future<void> signOut() async {
-    // Clear user cache
     if (currentUser != null) {
       await _cacheService.clearCache('user_subscription_${currentUser!.uid}');
     }
@@ -82,7 +74,6 @@ class AuthService {
     }
   }
 
-  // Update user profile
   Future<void> updateUserProfile(String name) async {
     try {
       await currentUser?.updateDisplayName(name);
@@ -95,7 +86,6 @@ class AuthService {
     }
   }
 
-  // Get user subscription info
   Future<Map<String, dynamic>?> getUserSubscription() async {
     try {
       
@@ -103,7 +93,6 @@ class AuthService {
         return null;
       }
       
-      // Check cache first
       final cacheKey = 'user_subscription_${currentUser!.uid}';
       final cachedData = _cacheService.getFromCache(cacheKey);
       if (cachedData != null) {
@@ -115,15 +104,12 @@ class AuthService {
           .doc(currentUser!.uid)
           .get();
       
-      
       if (doc.exists) {
         Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
         
-        // Convert Timestamps to serializable format before caching
         if (data != null) {
           Map<String, dynamic> cacheableData = Map.from(data);
           
-          // Convert Timestamp fields to ISO8601 strings
           if (data['createdAt'] is Timestamp) {
             cacheableData['createdAt'] = (data['createdAt'] as Timestamp).toDate().toIso8601String();
           }
@@ -137,7 +123,6 @@ class AuthService {
             cacheableData['subscriptionExpiry'] = (data['subscriptionExpiry'] as Timestamp).toDate().toIso8601String();
           }
           
-          // Cache the serializable data for 1 hour
           _cacheService.saveToCache(cacheKey, cacheableData, duration: const Duration(hours: 1));
         }
         
@@ -150,7 +135,6 @@ class AuthService {
     }
   }
 
-  // Update subscription
   Future<void> updateSubscription(String subscriptionType, DateTime expiryDate) async {
     try {
       await _firestore.collection('users').doc(currentUser!.uid).update({
@@ -163,28 +147,21 @@ class AuthService {
     }
   }
 
-  // Check if user has active subscription (role-based)
   Future<bool> hasActiveSubscription() async {
     try {
-      
       Map<String, dynamic>? userData = await getUserSubscription();
       
       if (userData == null) {
         return false;
       }
 
-      
       String role = userData['role'] ?? 'user';
       
-      // ADMIN - ma dostęp do wszystkiego
       if (role == 'admin') {
         return true;
       }
       
-      // SUBSCRIPTION - sprawdź czy subskrypcja jest aktywna
       if (role == 'subscription') {
-        
-        // Handle both Timestamp and String (from cache)
         DateTime? expiryDate;
         var expiryValue = userData['subscriptionExpiry'];
         
@@ -206,14 +183,12 @@ class AuthService {
         return isActive;
       }
       
-      // USER - brak dostępu do premium
       return false;
     } catch (e) {
       return false;
     }
   }
   
-  // Get user role
   Future<String> getUserRole() async {
     try {
       Map<String, dynamic>? userData = await getUserSubscription();
@@ -223,9 +198,7 @@ class AuthService {
     }
   }
 
-  // Handle Firebase Auth exceptions
   String _handleAuthException(FirebaseAuthException e) {
-    
     switch (e.code) {
       case 'user-not-found':
         return 'Nie znaleziono użytkownika z tym adresem email.';
@@ -252,7 +225,6 @@ class AuthService {
     }
   }
 
-  // Handle custom exceptions
   String handleCustomException(Exception e) {
     if (e.toString().contains('EMAIL_NOT_VERIFIED')) {
       return 'EMAIL_NOT_VERIFIED';
