@@ -177,7 +177,7 @@ budapp/
 - Flutter SDK (>=3.0.0)
 - Dart SDK (>=2.19.0)
 - Android Studio / Xcode
-- Konto Firebase
+- Konto Firebase(Zakladane przez rejestracje w aplikacji)
 
 ### Kroki Instalacji
 
@@ -215,7 +215,8 @@ flutter pub get
 ```bash
 flutter run
 ```
-
+6. ** AWARYJNIE**
+Jeżeli projekt ma problem z budowaniem(Problem z gradle na android), to trzeba wyczyścić build/cale gradle i zbudowac na nowo projekt.
 ---
 
 ## 🔧 Konfiguracja Firebase
