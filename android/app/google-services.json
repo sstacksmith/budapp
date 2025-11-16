@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852045336775",
+    "project_id": "budapp-6e0a7",
+    "storage_bucket": "budapp-6e0a7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852045336775:android:e4f78417c254c7f6ceeee2",
+        "android_client_info": {
+          "package_name": "com.example.budapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-AgKSB9Wm_yeQaA35Y3yz-C0Ax5iCSI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
