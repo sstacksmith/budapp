@@ -1,4 +1,4 @@
-# 🏗️ BudApp - Aplikacja Budowlana
+#  BudApp - Aplikacja Budowlana
 
 ![BudApp Logo](photos/budapplogo.png)
 
@@ -397,58 +397,12 @@ flutter analyze
 - [ ] System certyfikacji wykonawców
 
 ---
-
-## 🤝 Wkład w Projekt
-
-Chcesz pomóc w rozwoju BudApp? Świetnie!
-
-1. Fork projektu
-2. Stwórz branch (`git checkout -b feature/AmazingFeature`)
-3. Commit zmian (`git commit -m 'Add some AmazingFeature'`)
-4. Push do brancha (`git push origin feature/AmazingFeature`)
-5. Otwórz Pull Request
-
-### Wytyczne
-- Kod musi przejść `flutter analyze` bez błędów
-- Dodaj testy dla nowych funkcji
-- Dokumentuj publiczne API
-- Używaj konwencji nazewnictwa Dart
-
----
-
-## 📄 Licencja
-
-Ten projekt jest licencjonowany na zasadach MIT License - zobacz plik [LICENSE](LICENSE) dla szczegółów.
-
----
-
 ## 👨‍💻 Autor
 
 **BudApp Team**
-- Email: contact@budapp.com
-- Website: https://budapp.com
+- Email: stefanskistrony@gmail.com
+- Website: https://devpatryk.pl-not active
 - GitHub: [@budapp](https://github.com/budapp)
-
----
-
-## 🙏 Podziękowania
-
-- Flutter Team za wspaniały framework
-- Firebase za backend infrastructure
-- OpenWeatherMap za API pogodowe
-- Społeczność Flutter za wsparcie i inspirację
-
----
-
-## 📞 Wsparcie
-
-Masz pytania lub problemy?
-
-- 📧 Email: support@budapp.com
-- 💬 Discord: [BudApp Community](https://discord.gg/budapp)
-- 📖 Dokumentacja: https://docs.budapp.com
-- 🐛 Issues: https://github.com/budapp/budapp/issues
-
 ---
 
 ## ⚡ Quick Start Guide
@@ -522,6 +476,4 @@ Masz pytania lub problemy?
 - ✅ Custom branding
 - ✅ Dedicated support
 
----
-
-**Zbudujmy coś wspaniałego razem! 🏗️**
+BUDAPP :)
